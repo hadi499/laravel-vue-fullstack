@@ -13,12 +13,28 @@ use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = PostResource::collection(Post::latest()->get());
-        // $posts = Post::latest()->get();
+        // $posts = PostResource::collection(Post::latest()->paginate(3));
+        $search = $request->input('search');
+
+        $query = Post::query()
+            ->when($search, function ($query, $search) {
+                // Memecah kata kunci pencarian menjadi array
+                $searchTerms = explode(' ', $search);
+
+                foreach ($searchTerms as $term) {
+                    // Menggunakan where untuk setiap kata kunci
+                    $query->where('title', 'like', "%{$term}%");
+                }
+            })
+            ->latest()->paginate(3);
+
+        $posts = PostResource::collection($query);
+
         return Inertia::render('Posts/Index', [
-            'posts' => $posts
+            'posts' => $posts,
+            'filters' => $request->only(['search'])
         ]);
     }
 

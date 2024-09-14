@@ -3,8 +3,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import noImage from '../../Components/image/no-image.jpg'
 import { Inertia } from "@inertiajs/inertia"
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import DeleteModal from '@/Components/modal/DeleteModal.vue'
+import Pagination from '@/Components/Pagination.vue'
+import { debounce } from 'lodash';
 
 
 const deletePostModal = ref(false);
@@ -16,21 +18,26 @@ const showDeleteModal = (post) => {
 };
 
 
-defineProps({
+const props = defineProps({
   posts: Object,
+  filters: Object,
 
 })
 
-const deletePost = (id) => {
-  if (confirm('Are you sure you want to delete this post?')) {
-    Inertia.delete(route('posts.destroy', id), {
-      onSuccess: () => {
-        // Logika setelah berhasil menghapus post
-        console.log('Post has been deleted!');
-      }
-    });
-  }
-};
+const search = ref(props.filters.search)
+
+const debouncedSearch = debounce((value) => {
+  Inertia.get('/posts', { search: value }, {
+    preserveState: true,
+    replace: true,
+  });
+}, 300);
+
+watch(search, value => {
+  debouncedSearch(value);
+});
+
+
 
 
 </script>
@@ -47,6 +54,24 @@ const deletePost = (id) => {
 
     <div class="py-6">
       <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+        <div class="relative mb-5">
+          <input type="text" v-model="search"
+            class="py-2 pl-10 pr-3 w-64 border border-gray-300 rounded-lg outline-none focus:border-blue-500">
+          <button type="submit" class="absolute left-2 top-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+          </button>
+          <!-- Clear button -->
+          <button v-if="search" @click="search = ''" class="absolute left-56 top-3">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="size-6 font-semibold p-1 rounded-full bg-blue-300">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
         <div class="mb-3 flex justify-end">
           <Link href="/posts/create" class=" px-2 py-1 bg-indigo-500 hover:bg-indigo-700 text-white text-sm
                         rounded-md
@@ -57,18 +82,22 @@ const deletePost = (id) => {
           <thead>
             <tr class="bg-blue-100 border-b">
               <th class="text-left py-3 px-4 font-semibold text-sm text-gray-600">Title</th>
-              <th class="text-left py-3 px-4 font-semibold text-sm text-gray-600">
-                Slug
-              </th>
+              <th class="text-left py-3 px-4 font-semibold text-sm text-gray-600">Slug</th>
+              <th class="text-left py-3 px-4 font-semibold text-sm text-gray-600">Category</th>
               <th class="text-left py-3 px-4 font-semibold text-sm text-gray-600">Image</th>
               <th class="text-left py-3 px-4 font-semibold text-sm text-gray-600">Action</th>
 
             </tr>
           </thead>
           <tbody>
-            <tr v-for="post in posts.data" key="post.id" class="hover:bg-gray-50">
+            <tr v-for="post in posts.data" key="post.id" class="">
               <td class="py-3 px-4 border-b">{{ post.title }}</td>
               <td class="py-3 px-4 border-b">{{ post.slug }}</td>
+              <td class="py-3 px-4 border-b">
+                <Link :href="`/categories/${post.category.slug}`" class="hover:text-blue-700">
+                {{ post.category.name }}
+                </Link>
+              </td>
               <td v-if="post.image == null" class="py-3 px-4 border-b">
                 <img :src="noImage" alt="No image available" class="w-8 h-8" />
               </td>
@@ -92,6 +121,8 @@ const deletePost = (id) => {
             <!-- Add more rows as needed -->
           </tbody>
         </table>
+
+        <Pagination :links="posts.meta.links" />
 
 
 
