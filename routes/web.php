@@ -24,10 +24,13 @@ Route::get('/', function () {
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('adminUser:admin');
     Route::post('/dashboard', [DashboardController::class, 'store'])->name('dashboard.store');
+    Route::get('/test', [DashboardController::class, 'test'])->name('test');
+    Route::post('/test', [DashboardController::class, 'storeTest'])->name('test.store');
     Route::put('/dashboard/{category:slug}/edit', [DashboardController::class, 'update'])->name('dashboard.update');
     Route::delete('/dashboard/{category:id}', [DashboardController::class, 'destroy'])->name('dashboard.destroy');
+
     Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/posts/create', [PostController::class, 'store'])->name('posts.store');

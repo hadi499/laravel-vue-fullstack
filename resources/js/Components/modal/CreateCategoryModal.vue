@@ -34,6 +34,8 @@ import InputLabel from "@/Components/InputLabel.vue";
 import { useForm } from "@inertiajs/vue3";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { showErrorDialog, showSuccessNotification } from "@/event-bus.js";
+
 
 
 const form = useForm({
@@ -50,10 +52,24 @@ function createCategory() {
   form.post(route('dashboard.store'), {
     preserveScroll: true,
     onSuccess: () => {
+      showSuccessNotification(`category have been create.`)
+
+    },
+    onError: errors => {
+      let message = '';
+
+      if (Object.keys(errors).length > 0) {
+        message = errors[Object.keys(errors)[0]]
+      } else {
+        message = 'Error during category make. Please try again later.'
+      }
+
+      showErrorDialog(message)
+    },
+    onFinish: () => {
       closeModal()
       form.reset();
-    },
-    onError: () => folderNameInput.value.focus()
+    }
   })
 }
 

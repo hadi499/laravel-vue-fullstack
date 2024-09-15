@@ -1,11 +1,17 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import CreateCategoryModal from '@/Components/modal/CreateCategoryModal.vue';
 import EditCategoryModal from '@/Components/modal/EditCategoryModal.vue';
 import DeleteCategoryModal from '@/Components/modal/DeleteCategoryModal.vue';
 import DetailCategoryModal from '@/Components/modal/DetailCategoryModal.vue';
+
+
+import ErrorDialog from "@/Components/ErrorDialog.vue";
+import Notification from "@/Components/Notification.vue";
+
+
 
 
 const createCategoryModal = ref(false)
@@ -87,6 +93,9 @@ const showDeleteModal = (category) => {
             <!-- Add more rows as needed -->
           </tbody>
         </table>
+
+        <ErrorDialog />
+        <Notification />
 
         <CreateCategoryModal v-model="createCategoryModal" />
         <EditCategoryModal v-model="editCategoryModal" :category="selectedCategory" />

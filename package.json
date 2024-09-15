@@ -25,7 +25,9 @@
         "@tiptap/starter-kit": "^2.6.6",
         "@tiptap/vue-3": "^2.6.6",
         "lodash": "^4.17.21",
+        "mitt": "^3.0.1",
         "vue-material-design-icons": "^5.3.0",
+        "vue-toastification": "^2.0.0-rc.5",
         "vuejs3-datepicker": "^1.1.3"
     }
 }

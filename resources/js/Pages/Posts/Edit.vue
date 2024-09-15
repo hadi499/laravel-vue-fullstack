@@ -61,7 +61,7 @@ const submit = () => {
     </template>
 
     <div class="py-12">
-      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 flex justify-center">
         <form class="p-4 bg-white flex flex-col gap-3 w-[600px]" @submit.prevent="submit">
           <div class="flex flex-col gap-2">
             <InputLabel for="title" value="Title" />

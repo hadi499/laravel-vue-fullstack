@@ -36,6 +36,7 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { watch } from "vue";
 import { Inertia } from "@inertiajs/inertia";
+import { showErrorDialog, showSuccessNotification, showErrorNotification } from "@/event-bus.js";
 
 
 const props = defineProps({
@@ -44,8 +45,12 @@ const props = defineProps({
 
 })
 
+// const form = useForm({
+//   name: '',
+// })
 const form = useForm({
-  name: '',
+  name: props.category?.name,
+  slug: props.category?.slug,
 })
 
 
@@ -53,22 +58,57 @@ const emit = defineEmits(['update:modelValue', 'update:category'])
 
 watch(() => props.category, (newCategory) => {
   form.name = newCategory?.name || '';
+  form.slug = newCategory?.slug || '';
 
 }, { immediate: true });
 
 
+// const editCategory = () => {
+//   Inertia.post(`/dashboard/${props.category.slug}/edit`, {
+//     _method: "put",
+//     name: form.name,
+//     slug: form.slug,
+//   });
+// }
+
 const editCategory = () => {
-  Inertia.post(`/dashboard/${props.category.slug}/edit`, {
-    _method: "put",
+  form.put(`/dashboard/${props.category.slug}/edit`, {
     name: form.name,
+    slug: form.slug,
+
+    onSuccess: () => {
+      showSuccessNotification(`category updated.`)
+
+    },
+    onError: errors => {
+      let message = '';
+
+      if (Object.keys(errors).length > 0) {
+        message = errors[Object.keys(errors)[0]]
+      } else {
+        message = 'Error during category update. Please try again later.'
+      }
+
+      showErrorNotification(message)
+    },
+    onFinish: () => {
+      closeModal()
+      form.reset();
+    }
   });
 }
 
+
+
 function closeModal() {
+
   emit('update:modelValue')
   form.clearErrors();
   form.reset()
+
 }
+
+
 
 
 </script>

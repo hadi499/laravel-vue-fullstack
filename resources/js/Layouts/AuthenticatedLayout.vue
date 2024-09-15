@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
@@ -7,10 +7,24 @@ import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
 import noImage from '../Components/image/default.jpg'
+import { usePage } from '@inertiajs/vue3';
+
+const { props } = usePage();
 
 const url = ref('http://127.0.0.1:8000/storage/')
 
 const showingNavigationDropdown = ref(false);
+const showFlashMessage = ref(true);
+
+onMounted(() => {
+    if (props.flash.message) {
+        setTimeout(() => {
+            showFlashMessage.value = false;
+        }, 3000); // Tutup setelah 5 detik (5000ms)
+    }
+});
+
+
 
 </script>
 
@@ -31,7 +45,8 @@ const showingNavigationDropdown = ref(false);
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                <NavLink v-if="$page.props.auth.user.role == 'admin'" :href="route('dashboard')"
+                                    :active="route().current('dashboard')">
                                     Dashboard
                                 </NavLink>
                                 <NavLink :href="route('posts.index')" :active="route().current('posts.index')">
@@ -141,7 +156,20 @@ const showingNavigationDropdown = ref(false);
 
             <!-- Page Content -->
             <main>
+
+                <div v-if="props.flash.message && showFlashMessage"
+                    class="text-blue-700 text-center bg-blue-100 p-4 w-[200px] mt-4 ml-auto mr-7 relative">
+                    <div>
+                        {{ props.flash.message }}
+                    </div>
+                    <button @click="showFlashMessage = false"
+                        class="absolute top-1 right-2 font-semibold text-gray-700 hover:text-gray-700">
+                        x
+                    </button>
+                </div>
                 <slot />
+
+
             </main>
         </div>
     </div>

@@ -19,6 +19,7 @@ class PostController extends Controller
         $search = $request->input('search');
 
         $query = Post::query()
+            ->where('user_id', auth()->user()->id)
             ->when($search, function ($query, $search) {
                 // Memecah kata kunci pencarian menjadi array
                 $searchTerms = explode(' ', $search);
@@ -84,7 +85,7 @@ class PostController extends Controller
 
         Post::create($validatedData);
 
-        return redirect(route('posts.index'));
+        return redirect(route('posts.index'))->with('message', 'Created is success!');
     }
 
     public function edit(Post $post)
@@ -124,7 +125,7 @@ class PostController extends Controller
         Post::where('id', $post->id)
             ->update($validatedData);
 
-        return redirect("/posts")->with('success', 'Updated is success!');
+        return redirect("/posts")->with('message', 'Updated is success!');
     }
 
     public function destroy(Post $post)

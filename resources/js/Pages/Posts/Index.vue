@@ -121,6 +121,9 @@ watch(search, value => {
             <!-- Add more rows as needed -->
           </tbody>
         </table>
+        <div v-if="!posts.data.length" class="py-8 text-center text-sm text-gray-400">
+          There is no record data.
+        </div>
 
         <Pagination :links="posts.meta.links" />
 

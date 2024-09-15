@@ -26,12 +26,12 @@ class DashboardController extends Controller
     {
 
         $validatedData = $request->validate([
-            'name' => 'required|max:255',
+            'name' => 'required|max:255|unique:categories,name',
+            'slug' => 'required'
         ]);
 
 
         $validatedData['slug'] = Str::slug($request->name);
-
         Category::create($validatedData);
     }
 
@@ -39,7 +39,8 @@ class DashboardController extends Controller
     {
 
         $rules = [
-            'name' => 'required|max:255',
+            'name' => 'required|max:255|unique:categories,name',
+            'slug' => 'required'
         ];
 
 
@@ -53,5 +54,15 @@ class DashboardController extends Controller
     {
 
         Category::destroy($category->id);
+    }
+
+    public function test()
+    {
+        return Inertia::render('Dashboard/Test');
+    }
+
+    public function storeTest()
+    {
+        return redirect('dashboard')->with('message', 'test is success!');
     }
 }
